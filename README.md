@@ -58,7 +58,7 @@ Uses a separate `mrfixmyhome_test` database and wipes it each run, so never poin
 ```bash
 docker compose up --build -d
 ```
-Set `JWT_SECRET` first. The app runs on http://localhost:4000. Add demo data with `docker compose exec app npx tsx prisma/seed.ts`.
+Set `JWT_SECRET` first. The app runs on http://localhost:4000. Add demo data with `docker compose exec app npx tsx prisma/seed.ts`, or set `AUTO_SEED=true` to load it on every start.
 
 ## Deploying on a free tier
 - `render.yaml` sets up a free Render web service and a free Render Postgres, already connected to each other. Render deletes free databases after 30 days. For a database that does not expire, use a free Neon database and set its connection string as `DATABASE_URL` instead.

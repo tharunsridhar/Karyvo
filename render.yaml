@@ -24,6 +24,9 @@ services:
         generateValue: true
       - key: COOKIE_SECURE
         value: "true"
+      # Loads the demo accounts and services on start (Render free has no shell to do it by hand)
+      - key: AUTO_SEED
+        value: "true"
       # Let the free database sleep: no background timer, visitor data cleaned after a day
       - key: SWEEP_INTERVAL_SECONDS
         value: "0"

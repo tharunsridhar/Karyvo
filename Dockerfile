@@ -15,5 +15,6 @@ RUN npm run build
 COPY --from=web /web/dist /app/public
 ENV NODE_ENV=production WEB_DIST=/app/public PORT=4000
 EXPOSE 4000
-# Migrations run on every start, then the API
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+# Migrations run on every start. With AUTO_SEED=true the demo data is loaded too (safe to repeat),
+# which matters on hosts without a shell, like Render free.
+CMD ["sh", "-c", "npx prisma migrate deploy && if [ \"$AUTO_SEED\" = \"true\" ]; then npx tsx prisma/seed.ts; fi && node dist/index.js"]
