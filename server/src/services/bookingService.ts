@@ -72,6 +72,12 @@ export async function availableSlots(serviceId: number, date: string) {
   return { service, timezone: tz, slots };
 }
 
+function isDeadlock(e: unknown) {
+  if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2034") return true;
+  const msg = String((e as Error)?.message ?? "");
+  return msg.includes("deadlock detected") || msg.includes("40P01");
+}
+
 function isOverlapError(e: unknown) {
   const msg = String((e as Error)?.message ?? "");
   return msg.includes("booking_no_overlap") || msg.includes("23P01");
@@ -120,10 +126,11 @@ export async function createBooking(args: {
   }
 
   const endAt = new Date(args.startAt.getTime() + svc.durationMin * 60_000);
-  try {
-    // The exclusion constraint on Booking is the real guard: if a concurrent request
-    // inserted an overlapping blocking booking first, this insert fails atomically.
-    const booking = await prisma.$transaction(async (tx) => {
+
+  // The exclusion constraint on Booking is the real guard: if a concurrent request
+  // inserted an overlapping blocking booking first, this insert fails atomically.
+  const insert = () =>
+    prisma.$transaction(async (tx) => {
       const b = await tx.booking.create({
         data: {
           customerId,
@@ -159,14 +166,31 @@ export async function createBooking(args: {
       );
       return b;
     });
-    return { booking, replay: false };
-  } catch (e) {
-    if (isOverlapError(e)) throw conflict("That time slot was just taken", "SLOT_TAKEN");
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
-      const again = await findReplay();
-      if (again) return { booking: again, replay: true };
+
+  // When several inserts race on the same range, PostgreSQL may abort a loser as a deadlock
+  // victim instead of raising the overlap error. Retrying lets it see the winner and conflict
+  // cleanly (or find its own idempotent row).
+  const MAX_ATTEMPTS = 4;
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return { booking: await insert(), replay: false };
+    } catch (e) {
+      if (isOverlapError(e)) throw conflict("That time slot was just taken", "SLOT_TAKEN");
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+        const again = await findReplay();
+        if (again) return { booking: again, replay: true };
+      }
+      if (isDeadlock(e)) {
+        const again = await findReplay();
+        if (again) return { booking: again, replay: true };
+        if (attempt >= MAX_ATTEMPTS) {
+          throw conflict("That slot is being booked by someone else, please try again", "SLOT_BUSY");
+        }
+        await new Promise((r) => setTimeout(r, 20 * attempt + Math.random() * 30));
+        continue;
+      }
+      throw e;
     }
-    throw e;
   }
 }
 
