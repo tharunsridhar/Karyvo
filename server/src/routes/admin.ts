@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../db.js";
 import { badRequest, conflict, forbidden, notFound } from "../lib/errors.js";
-import { intParam, parse, wrap } from "../lib/http.js";
+import { intParam, parse, stripBlank, wrap } from "../lib/http.js";
 import { me, requireAuth, requireRole } from "../middleware/auth.js";
 
 const slugify = (s: string) =>
@@ -50,7 +50,7 @@ export function adminRouter() {
           q: z.string().trim().optional(),
           role: z.enum(["CUSTOMER", "PROVIDER", "ADMIN"]).optional(),
         }),
-        req.query,
+        stripBlank(req.query),
       );
       const users = await prisma.user.findMany({
         where: {
@@ -152,7 +152,7 @@ export function adminRouter() {
             .enum(["PENDING", "ACCEPTED", "DECLINED", "CANCELLED", "IN_PROGRESS", "COMPLETED", "EXPIRED"])
             .optional(),
         }),
-        req.query,
+        stripBlank(req.query),
       );
       const bookings = await prisma.booking.findMany({
         where: { status },

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../db.js";
 import { notFound } from "../lib/errors.js";
-import { intParam, parse, wrap } from "../lib/http.js";
+import { intParam, parse, stripBlank, wrap } from "../lib/http.js";
 import { availableSlots, expireStale } from "../services/bookingService.js";
 import { requireAuth, me } from "../middleware/auth.js";
 
@@ -50,7 +50,7 @@ export function publicRouter() {
   r.get(
     "/services",
     wrap(async (req, res) => {
-      const f = parse(listSchema, req.query);
+      const f = parse(listSchema, stripBlank(req.query));
       const services = await prisma.service.findMany({
         where: {
           active: true,
@@ -160,7 +160,7 @@ export function publicRouter() {
   r.get(
     "/services/:id/slots",
     wrap(async (req, res) => {
-      const { date } = parse(z.object({ date: z.string() }), req.query);
+      const { date } = parse(z.object({ date: z.string() }), stripBlank(req.query));
       await expireStale();
       const out = await availableSlots(intParam(req), date);
       res.json({

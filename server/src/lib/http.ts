@@ -24,3 +24,9 @@ export function intParam(req: Request, name = "id"): number {
   if (!Number.isInteger(n) || n <= 0) throw badRequest(`Invalid ${name}`);
   return n;
 }
+
+/** Forms often send empty query values (?role=&q=). Treat them as "not provided". */
+export function stripBlank(query: unknown): unknown {
+  if (!query || typeof query !== "object") return query;
+  return Object.fromEntries(Object.entries(query as Record<string, unknown>).filter(([, v]) => v !== ""));
+}
