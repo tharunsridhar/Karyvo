@@ -143,12 +143,13 @@ npm --prefix server run loadtest   # basic load test, API must be running and se
 - A `Dockerfile` builds the web app and API into one image. The API serves the built frontend.
 - `docker-compose.yml` runs the app with PostgreSQL. Set `JWT_SECRET` first.
 - Host ports are `APP_PORT` (default 4000) and `POSTGRES_PORT` (default 5434), so they do not clash with a local PostgreSQL.
-- Not tested yet: the image has not been built or run.
+- Tested: image builds, migrations run on start, the API serves the frontend, and the full booking flow works against the container.
+- First run needs demo data: `docker exec karyvo-app-1 npx tsx prisma/seed.ts` (container name may differ, check `docker ps`).
 - On start the container runs `prisma migrate deploy`, then the API.
 - Production settings: `NODE_ENV=production`, `COOKIE_SECURE=true` behind HTTPS, `CORS_ORIGIN` set to the real site origin.
 - The app refuses to start in production with the dev JWT secret.
 - Backup: `pg_dump -Fc "$DATABASE_URL" > karyvo.dump`. Restore: `pg_restore --clean --no-owner -d "$DATABASE_URL" karyvo.dump`.
-- Not deployed anywhere yet. See limitations.
+- Not deployed to a public host yet. See limitations.
 
 ## Load test result (local, one process, laptop)
 - Slot search: about 105 requests per second, p99 about 370 ms.
