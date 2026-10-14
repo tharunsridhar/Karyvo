@@ -2,6 +2,10 @@
 
 A booking site for local services like plumbing, electrical work and cleaning. Customers pick a free time slot and book it. Providers set their working hours and accept jobs. Admins keep things in order.
 
+Live demo: https://mr-fix-my-home.onrender.com
+
+It runs on free hosting, so the first load after a quiet period can take up to a minute. Sign in with the demo logins below.
+
 ## What you can do
 - Customers: search services, book a slot, cancel, get notified, leave a review.
 - Providers: add services, set weekly hours and days off, accept or decline requests, mark jobs done.
