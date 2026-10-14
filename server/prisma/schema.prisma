@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  PROVIDER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  name         String
+  email        String       @unique
+  passwordHash String
+  role         Role         @default(CUSTOMER)
+  status       UserStatus   @default(ACTIVE)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  provider     ProviderProfile?
+  bookings     Booking[]    @relation("CustomerBookings")
+  reviews      Review[]
+  notifications Notification[]
+  auditLogs    AuditLog[]
+  reports      Report[]
+}
+
+model ProviderProfile {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio       String   @default("")
+  city      String   @default("")
+  timezone  String   @default("UTC")
+  createdAt DateTime @default(now())
+  services  Service[]
+  areas     ServiceArea[]
+  rules     AvailabilityRule[]
+  exceptions AvailabilityException[]
+  bookings  Booking[]
+}
+
+model ServiceCategory {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  slug     String    @unique
+  services Service[]
+}
+
+model Service {
+  id           Int             @id @default(autoincrement())
+  providerId   Int
+  provider     ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  categoryId   Int
+  category     ServiceCategory @relation(fields: [categoryId], references: [id])
+  title        String
+  description  String          @default("")
+  durationMin  Int
+  priceCents   Int
+  currency     String          @default("USD")
+  active       Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  bookings     Booking[]
+
+  @@index([providerId])
+  @@index([categoryId, active])
+}
+
+// Coverage area: a postcode prefix the provider serves, e.g. "SW1".
+model ServiceArea {
+  id         Int             @id @default(autoincrement())
+  providerId Int
+  provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  postcode   String
+
+  @@unique([providerId, postcode])
+}
+
+// Weekly working hours in the provider's local time. weekday: 1=Mon .. 7=Sun.
+// Minutes are minutes after local midnight.
+model AvailabilityRule {
+  id         Int             @id @default(autoincrement())
+  providerId Int
+  provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  weekday    Int
+  startMin   Int
+  endMin     Int
+
+  @@index([providerId, weekday])
+}
+
+// A specific local date. No window = day off; with window = special hours replacing the weekly rules.
+model AvailabilityException {
+  id         Int             @id @default(autoincrement())
+  providerId Int
+  provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  date       String // YYYY-MM-DD in provider timezone
+  startMin   Int?
+  endMin     Int?
+  note       String          @default("")
+
+  @@unique([providerId, date])
+}
+
+model Booking {
+  id             Int             @id @default(autoincrement())
+  customerId     Int
+  customer       User            @relation("CustomerBookings", fields: [customerId], references: [id])
+  providerId     Int
+  provider       ProviderProfile @relation(fields: [providerId], references: [id])
+  serviceId      Int
+  service        Service         @relation(fields: [serviceId], references: [id])
+  startAt        DateTime
+  endAt          DateTime
+  priceCents     Int // snapshot at booking time
+  currency       String
+  serviceTitle   String // snapshot
+  status         BookingStatus   @default(PENDING)
+  notes          String          @default("")
+  idempotencyKey String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  history        BookingStatusHistory[]
+  review         Review?
+
+  @@unique([customerId, idempotencyKey])
+  @@index([providerId, startAt])
+  @@index([customerId])
+}
+
+model BookingStatusHistory {
+  id        Int            @id @default(autoincrement())
+  bookingId Int
+  booking   Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  fromStatus BookingStatus?
+  toStatus  BookingStatus
+  actorId   Int?
+  note      String         @default("")
+  createdAt DateTime       @default(now())
+
+  @@index([bookingId])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  bookingId Int      @unique
+  booking   Booking  @relation(fields: [bookingId], references: [id])
+  customerId Int
+  customer  User     @relation(fields: [customerId], references: [id])
+  providerId Int
+  rating    Int
+  text      String   @default("")
+  hidden    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([providerId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  message   String
+  bookingId Int?
+  dedupeKey String   @unique
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model AuditLog {
+  id         Int      @id @default(autoincrement())
+  actorId    Int
+  actor      User     @relation(fields: [actorId], references: [id])
+  action     String
+  targetType String
+  targetId   Int
+  detail     String   @default("")
+  createdAt  DateTime @default(now())
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  reporterId Int
+  reporter   User     @relation(fields: [reporterId], references: [id])
+  targetType String // "service" | "review"
+  targetId   Int
+  reason     String
+  resolved   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}

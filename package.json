@@ -1,0 +1,19 @@
+{
+  "name": "karyvo",
+  "private": true,
+  "description": "Local services booking platform",
+  "scripts": {
+    "install:all": "npm --prefix server install --legacy-peer-deps && npm --prefix web install",
+    "dev:server": "npm --prefix server run dev",
+    "dev:web": "npm --prefix web run dev",
+    "build": "npm --prefix server run build && npm --prefix web run build",
+    "test": "npm --prefix server test",
+    "lint": "npm --prefix server run lint && npm --prefix web run lint",
+    "format": "prettier --write \"server/{src,tests,prisma}/**/*.ts\" \"web/src/**/*.{ts,tsx,css}\"",
+    "db:migrate": "npm --prefix server run db:deploy",
+    "db:seed": "npm --prefix server run db:seed"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1"
+  }
+}
