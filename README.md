@@ -142,6 +142,8 @@ npm --prefix server run loadtest   # basic load test, API must be running and se
 ## Deployment
 - A `Dockerfile` builds the web app and API into one image. The API serves the built frontend.
 - `docker-compose.yml` runs the app with PostgreSQL. Set `JWT_SECRET` first.
+- Host ports are `APP_PORT` (default 4000) and `POSTGRES_PORT` (default 5434), so they do not clash with a local PostgreSQL.
+- Not tested yet: the image has not been built or run.
 - On start the container runs `prisma migrate deploy`, then the API.
 - Production settings: `NODE_ENV=production`, `COOKIE_SECURE=true` behind HTTPS, `CORS_ORIGIN` set to the real site origin.
 - The app refuses to start in production with the dev JWT secret.
