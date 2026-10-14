@@ -4,7 +4,7 @@ import { prisma } from "./db.js";
 import { expireStale } from "./services/bookingService.js";
 
 const app = createApp();
-const server = app.listen(config.port, () => logger.info(`Mr Fix My Home API listening on :${config.port}`));
+const server = app.listen(config.port, () => logger.info(`FixItBro API listening on :${config.port}`));
 
 // Optional background sweep of expired pending requests. Reads also expire lazily, so on a
 // free database set SWEEP_INTERVAL_SECONDS=0 to let it sleep when nobody is browsing.

@@ -1,8 +1,8 @@
-# Mr Fix My Home
+# FixItBro
 
 A booking site for local services like plumbing, electrical work and cleaning. Customers pick a free time slot and book it. Providers set their working hours and accept jobs. Admins keep things in order.
 
-Live demo: https://mr-fix-my-home.onrender.com
+Live demo: https://fixitbro.onrender.com
 
 It runs on free hosting, so the first load after a quiet period can take up to a minute. Sign in with the demo logins below.
 
@@ -38,20 +38,20 @@ npm run dev:web
 - Website: http://localhost:5173
 - API docs: http://localhost:4000/api/docs
 
-No local database? Run `docker compose up -d postgres` and use `postgresql://mrfixmyhome:mrfixmyhome@localhost:5434/mrfixmyhome` as `DATABASE_URL`.
+No local database? Run `docker compose up -d postgres` and use `postgresql://fixitbro:fixitbro@localhost:5434/fixitbro` as `DATABASE_URL`.
 
 ## Demo logins
 Password for all of them is `Password123!`
 
-- Customer: `customer@mrfixmyhome.test`
-- Provider: `provider@mrfixmyhome.test`
-- Admin: `admin@mrfixmyhome.test`
+- Customer: `customer@fixitbro.test`
+- Provider: `provider@fixitbro.test`
+- Admin: `admin@fixitbro.test`
 
 ## Tests
 ```bash
 npm test
 ```
-Uses a separate `mrfixmyhome_test` database and wipes it each run, so never point it at real data.
+Uses a separate `fixitbro_test` database and wipes it each run, so never point it at real data.
 
 ## How double booking is stopped
 - The server rechecks the slot when you book, and bookings for one provider are processed one at a time.

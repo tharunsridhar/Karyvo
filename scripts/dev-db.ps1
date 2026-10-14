@@ -10,12 +10,12 @@ $bin = (Get-ChildItem "C:\Program Files\PostgreSQL\*\bin\pg_ctl.exe" | Sort-Obje
 if ($Action -eq "stop") { & "$bin\pg_ctl.exe" -D $data stop; exit }
 
 if (-not (Test-Path $data)) {
-  & "$bin\initdb.exe" -D $data -U mrfixmyhome --auth=trust -E UTF8 | Out-Null
+  & "$bin\initdb.exe" -D $data -U fixitbro --auth=trust -E UTF8 | Out-Null
 }
 Start-Process -FilePath "$bin\pg_ctl.exe" -ArgumentList "-D `"$data`" -o `"-p 5433`" -l `"$data\server.log`" start" -WindowStyle Hidden -Wait
 Start-Sleep 2
-foreach ($db in "mrfixmyhome", "mrfixmyhome_test") {
-  $exists = & "$bin\psql.exe" -h localhost -p 5433 -U mrfixmyhome -d postgres -tAc "select 1 from pg_database where datname='$db'"
-  if (-not $exists) { & "$bin\psql.exe" -h localhost -p 5433 -U mrfixmyhome -d postgres -c "create database $db" }
+foreach ($db in "fixitbro", "fixitbro_test") {
+  $exists = & "$bin\psql.exe" -h localhost -p 5433 -U fixitbro -d postgres -tAc "select 1 from pg_database where datname='$db'"
+  if (-not $exists) { & "$bin\psql.exe" -h localhost -p 5433 -U fixitbro -d postgres -c "create database $db" }
 }
-Write-Host "Postgres ready on localhost:5433 (databases: mrfixmyhome, mrfixmyhome_test)"
+Write-Host "Postgres ready on localhost:5433 (databases: fixitbro, fixitbro_test)"

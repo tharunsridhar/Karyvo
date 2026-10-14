@@ -15,9 +15,9 @@ function useAfterAuth() {
 
 const DEMO_PASSWORD = "Password123!";
 const DEMO_ACCOUNTS = [
-  { role: "Customer", username: "customer@mrfixmyhome.test" },
-  { role: "Provider", username: "provider@mrfixmyhome.test" },
-  { role: "Admin", username: "admin@mrfixmyhome.test" },
+  { role: "Customer", username: "customer@fixitbro.test" },
+  { role: "Provider", username: "provider@fixitbro.test" },
+  { role: "Admin", username: "admin@fixitbro.test" },
 ];
 
 export function Login() {

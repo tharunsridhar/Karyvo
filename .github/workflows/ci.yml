@@ -11,15 +11,15 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_USER: mrfixmyhome
-          POSTGRES_PASSWORD: mrfixmyhome
-          POSTGRES_DB: mrfixmyhome_test
+          POSTGRES_USER: fixitbro
+          POSTGRES_PASSWORD: fixitbro
+          POSTGRES_DB: fixitbro_test
         ports: ["5432:5432"]
         options: >-
-          --health-cmd "pg_isready -U mrfixmyhome" --health-interval 5s --health-retries 10
+          --health-cmd "pg_isready -U fixitbro" --health-interval 5s --health-retries 10
     env:
-      TEST_DATABASE_URL: postgresql://mrfixmyhome:mrfixmyhome@localhost:5432/mrfixmyhome_test
-      DATABASE_URL: postgresql://mrfixmyhome:mrfixmyhome@localhost:5432/mrfixmyhome_test
+      TEST_DATABASE_URL: postgresql://fixitbro:fixitbro@localhost:5432/fixitbro_test
+      DATABASE_URL: postgresql://fixitbro:fixitbro@localhost:5432/fixitbro_test
       JWT_SECRET: ci-secret-0123456789abcdef
     defaults:
       run:

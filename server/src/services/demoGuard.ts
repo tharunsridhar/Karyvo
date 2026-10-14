@@ -11,7 +11,7 @@ import { AppError } from "../lib/errors.js";
  * When a limit is hit the API answers 503 SERVER_FULL with a friendly message.
  */
 
-export const SEED_EMAIL_SUFFIX = "@mrfixmyhome.test";
+export const SEED_EMAIL_SUFFIX = "@fixitbro.test";
 
 const FULL_MESSAGE = "The demo server is full right now. Please try again in a while.";
 const BUDGET_MESSAGE = "The demo server has reached its daily usage limit. Please come back tomorrow.";

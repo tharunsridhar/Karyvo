@@ -2,14 +2,14 @@
 # that is wired in automatically (no connection string to paste).
 # Note: Render deletes free databases 30 days after creation, so re-seed or move to Neon after that.
 databases:
-  - name: mr-fix-my-home-db
+  - name: fixitbro-db
     plan: free
-    databaseName: mrfixmyhome
-    user: mrfixmyhome
+    databaseName: fixitbro
+    user: fixitbro
 
 services:
   - type: web
-    name: mr-fix-my-home
+    name: fixitbro
     runtime: docker
     plan: free
     healthCheckPath: /health
@@ -18,7 +18,7 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: mr-fix-my-home-db
+          name: fixitbro-db
           property: connectionString
       - key: JWT_SECRET
         generateValue: true

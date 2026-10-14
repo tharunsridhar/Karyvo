@@ -101,8 +101,8 @@ describe("cleanup of visitor data", () => {
   const old = new Date(Date.now() - 48 * 3_600_000);
 
   it("removes old visitor accounts and their data, keeps demo accounts and recent visitors", async () => {
-    const seedPro = await makeProviderWithService("provider@mrfixmyhome.test");
-    const seedCustomer = await makeUser("CUSTOMER", "customer@mrfixmyhome.test");
+    const seedPro = await makeProviderWithService("provider@fixitbro.test");
+    const seedCustomer = await makeUser("CUSTOMER", "customer@fixitbro.test");
     const visitorPro = await makeProviderWithService("visitorpro@example.com");
     const visitor = await makeUser("CUSTOMER", "visitor@example.com");
     const recent = await makeUser("CUSTOMER", "recent@example.com");
@@ -110,8 +110,8 @@ describe("cleanup of visitor data", () => {
       where: {
         email: {
           in: [
-            "provider@mrfixmyhome.test",
-            "customer@mrfixmyhome.test",
+            "provider@fixitbro.test",
+            "customer@fixitbro.test",
             "visitorpro@example.com",
             "visitor@example.com",
           ],
@@ -150,7 +150,7 @@ describe("cleanup of visitor data", () => {
     expect(await cleanupDemoData(24)).toBe(2);
 
     const emails = (await prisma.user.findMany({ select: { email: true } })).map((u) => u.email).sort();
-    expect(emails).toEqual(["customer@mrfixmyhome.test", "provider@mrfixmyhome.test", "recent@example.com"]);
+    expect(emails).toEqual(["customer@fixitbro.test", "provider@fixitbro.test", "recent@example.com"]);
     expect(await prisma.booking.count()).toBe(1);
     expect(await prisma.review.count()).toBe(0);
     expect(recent.id).toBeGreaterThan(0);

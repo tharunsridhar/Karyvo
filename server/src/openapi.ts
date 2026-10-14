@@ -9,14 +9,14 @@ const json = (schema: object) => ({ required: true, content: { "application/json
 export const openapi = {
   openapi: "3.0.3",
   info: {
-    title: "Mr Fix My Home API",
+    title: "FixItBro API",
     version: "1.0.0",
     description:
-      "Local services booking platform. Auth uses an httpOnly cookie (mrfixmyhome_token) set by /auth/login or /auth/register. Errors share one shape: { error: { code, message, details?, requestId } }.",
+      "Local services booking platform. Auth uses an httpOnly cookie (fixitbro_token) set by /auth/login or /auth/register. Errors share one shape: { error: { code, message, details?, requestId } }.",
   },
   servers: [{ url: "/api" }],
   components: {
-    securitySchemes: { cookieAuth: { type: "apiKey", in: "cookie", name: "mrfixmyhome_token" } },
+    securitySchemes: { cookieAuth: { type: "apiKey", in: "cookie", name: "fixitbro_token" } },
     schemas: {
       Error: {
         type: "object",
