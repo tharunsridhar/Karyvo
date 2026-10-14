@@ -7,7 +7,7 @@ import { Login, Register } from "./pages/AuthPages";
 import { Home, ServiceDetail, Services } from "./pages/Browse";
 import { MyBookings, Notifications } from "./pages/Customer";
 import Provider from "./pages/Provider";
-import { Empty, RequireRole } from "./ui";
+import { Empty, RequireRole, StatusBanner } from "./ui";
 
 function Nav() {
   const { user, logout } = useAuth();
@@ -112,6 +112,7 @@ export default function App() {
         Skip to content
       </a>
       <Nav />
+      <StatusBanner />
       <main id="main">
         <Routes>
           <Route path="/" element={<Home />} />

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "../db.js";
 import { conflict, forbidden, unauthorized } from "../lib/errors.js";
 import { parse, wrap } from "../lib/http.js";
+import { assertCapacity } from "../services/demoGuard.js";
 import { isValidTimezone } from "../lib/slots.js";
 import { COOKIE, cookieOptions, me, requireAuth, signToken } from "../middleware/auth.js";
 import type { User } from "@prisma/client";
@@ -43,6 +44,7 @@ export function authRouter() {
       if (await prisma.user.findUnique({ where: { email: body.email } })) {
         throw conflict("An account with this email already exists", "EMAIL_TAKEN");
       }
+      await assertCapacity("users");
       const passwordHash = await bcrypt.hash(body.password, 10);
       const user = await prisma.user.create({
         data: {

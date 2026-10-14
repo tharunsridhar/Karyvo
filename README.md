@@ -151,6 +151,26 @@ npm --prefix server run loadtest   # basic load test, API must be running and se
 - Backup: `pg_dump -Fc "$DATABASE_URL" > karyvo.dump`. Restore: `pg_restore --clean --no-owner -d "$DATABASE_URL" karyvo.dump`.
 - Not deployed to a public host yet. See limitations.
 
+## Free hosting limits
+Free tiers checked on 2026-10-14. Terms can change, so recheck before relying on them.
+
+| Service | Free limit | What happens at the limit |
+|---------|-----------|----------------------------|
+| Render web service | 750 hours a month, sleeps after 15 minutes idle, monthly bandwidth cap | Suspended until next month, or about a minute to wake from sleep |
+| Neon Postgres | 100 compute-hours a month, 1 GB storage, 5 GB transfer, sleeps after 5 minutes idle | Compute pauses, or writes blocked at 1 GB. Data is kept |
+| Render Postgres (not used) | Expires after 30 days, then deleted | Why Neon is used instead |
+
+The app protects itself so it degrades politely instead of failing:
+- Capacity caps: `MAX_USERS`, `MAX_BOOKINGS`, `MAX_SERVICES`. At the cap, sign-ups, bookings or new services get a 503 with the message that the server is full.
+- Daily budget: `DAILY_REQUEST_BUDGET` API calls per UTC day. After that every API call gets a 503 with `Retry-After` until midnight UTC.
+- Per-visitor rate limit: `API_RATE_MAX` calls a minute per IP, so one visitor cannot spend the shared budget.
+- Cleanup: with `DEMO_CLEANUP_HOURS=24`, accounts made by visitors (and their bookings and reviews) are deleted after a day. The `@karyvo.test` demo accounts stay. It runs when someone signs up, at most once an hour.
+- Banner: the site checks `GET /api/status` and shows a "Server is full" notice at the top when a limit is reached.
+- Sleep friendly: `/health` does not touch the database (use `/health?deep=1` for a database check), and `SWEEP_INTERVAL_SECONDS=0` turns off the background timer, so the free database can sleep.
+- Neon: use the direct (non-pooled) connection string with `?sslmode=require`, because migrations run on start.
+- `render.yaml` at the repo root has these settings ready for a Render blueprint deploy.
+- The daily counter lives in memory, so it also resets if the service restarts.
+
 ## Load test result (local, one process, laptop)
 - Slot search: about 105 requests per second, p99 about 370 ms.
 - Booking creation with 20 connections hammering 6 start times: 3 bookings created, 854 clean 409 conflicts, 0 errors, no overlaps.

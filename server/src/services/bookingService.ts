@@ -4,6 +4,7 @@ import { config } from "../config.js";
 import { prisma } from "../db.js";
 import { badRequest, conflict, forbidden, notFound, AppError } from "../lib/errors.js";
 import { computeSlots, isValidDate, localDate } from "../lib/slots.js";
+import { assertCapacity } from "./demoGuard.js";
 import { BLOCKING, actorFor, checkTransition, type Action } from "../lib/stateMachine.js";
 
 type Db = Prisma.TransactionClient;
@@ -95,6 +96,8 @@ export async function createBooking(args: {
 
   const existing = await findReplay();
   if (existing) return { booking: existing, replay: true };
+
+  await assertCapacity("bookings");
 
   const now = new Date();
   if (args.startAt <= now) throw badRequest("Start time must be in the future");

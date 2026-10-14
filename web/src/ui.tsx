@@ -1,6 +1,6 @@
-import { Component, type ReactNode } from "react";
+import { Component, useEffect, useState, type ReactNode } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
-import { ApiError } from "./api";
+import { api, ApiError } from "./api";
 import { useAuth } from "./auth";
 
 export function Loading({ label = "Loading" }: { label?: string }) {
@@ -119,4 +119,40 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { failed: 
     }
     return this.props.children;
   }
+}
+
+interface ServerStatus {
+  full: boolean;
+  message: string | null;
+}
+
+/** Shows a notice when the free demo server is at capacity or out of its daily budget. */
+export function StatusBanner() {
+  const [status, setStatus] = useState<ServerStatus | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    const check = () =>
+      api<ServerStatus>("/status")
+        .then((s) => live && setStatus(s))
+        .catch(() => undefined);
+    check();
+    const timer = setInterval(check, 5 * 60_000);
+    window.addEventListener("karyvo:full", check);
+    return () => {
+      live = false;
+      clearInterval(timer);
+      window.removeEventListener("karyvo:full", check);
+    };
+  }, []);
+
+  if (!status?.full) return null;
+  return (
+    <div className="alert warn banner" role="alert">
+      <span>
+        <strong>Server is full.</strong> {status.message} You can still browse, but signing up and booking may
+        be refused until there is room.
+      </span>
+    </div>
+  );
 }

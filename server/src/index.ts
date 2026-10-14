@@ -6,14 +6,17 @@ import { expireStale } from "./services/bookingService.js";
 const app = createApp();
 const server = app.listen(config.port, () => logger.info(`Karyvo API listening on :${config.port}`));
 
-// Sweep expired pending requests once a minute. Reads also expire lazily, so this
-// only keeps notifications timely when nobody is browsing.
-const timer = setInterval(() => {
-  expireStale().catch((err) => logger.error({ err: err.message }, "expiry sweep failed"));
-}, 60_000);
+// Optional background sweep of expired pending requests. Reads also expire lazily, so on a
+// free database set SWEEP_INTERVAL_SECONDS=0 to let it sleep when nobody is browsing.
+const timer =
+  config.sweepIntervalSeconds > 0
+    ? setInterval(() => {
+        expireStale().catch((err) => logger.error({ err: err.message }, "expiry sweep failed"));
+      }, config.sweepIntervalSeconds * 1000)
+    : null;
 
 async function shutdown() {
-  clearInterval(timer);
+  if (timer) clearInterval(timer);
   server.close();
   await prisma.$disconnect();
   process.exit(0);

@@ -10,6 +10,7 @@ export default defineConfig({
       DATABASE_URL: process.env.TEST_DATABASE_URL ?? "postgresql://karyvo@localhost:5433/karyvo_test",
       JWT_SECRET: "test-secret-0123456789abcdef",
       AUTH_RATE_MAX: "1000",
+      API_RATE_MAX: "100000",
       PENDING_TTL_MINUTES: "1440",
     },
   },

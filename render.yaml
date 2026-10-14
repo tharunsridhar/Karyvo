@@ -1,0 +1,33 @@
+# Render blueprint: one free web service built from the Dockerfile.
+# The database lives on Neon (free). Paste its direct (non-pooled) connection string as DATABASE_URL.
+services:
+  - type: web
+    name: karyvo
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"
+      # Let the free database sleep: no background timer, visitor data cleaned after a day
+      - key: SWEEP_INTERVAL_SECONDS
+        value: "0"
+      - key: DEMO_CLEANUP_HOURS
+        value: "24"
+      # Free-tier protection limits
+      - key: MAX_USERS
+        value: "300"
+      - key: MAX_BOOKINGS
+        value: "2000"
+      - key: MAX_SERVICES
+        value: "300"
+      - key: DAILY_REQUEST_BUDGET
+        value: "60000"
+      - key: API_RATE_MAX
+        value: "240"

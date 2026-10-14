@@ -19,6 +19,7 @@ import { authRouter } from "./routes/auth.js";
 import { bookingsRouter, notificationsRouter } from "./routes/bookings.js";
 import { providerRouter } from "./routes/provider.js";
 import { publicRouter } from "./routes/public.js";
+import { dailyBudget, getStatus } from "./services/demoGuard.js";
 
 export const logger = pino({
   level: config.env === "test" ? "silent" : "info",
@@ -48,12 +49,37 @@ export function createApp(opts: { authRateMax?: number } = {}) {
   app.use(express.json({ limit: "100kb" }));
   app.use(cookieParser());
 
-  app.get("/health", async (_req, res) => {
+  // Light by default so platform health checks do not keep a sleeping free database awake.
+  app.get("/health", async (req, res) => {
+    if (req.query.deep !== "1") return res.json({ status: "ok" });
     try {
       await prisma.$queryRaw`SELECT 1`;
       res.json({ status: "ok", db: "up" });
     } catch {
       res.status(503).json({ status: "degraded", db: "down" });
+    }
+  });
+
+  // Per-visitor limit, then the shared daily budget (protects free compute and bandwidth).
+  app.use(
+    "/api",
+    rateLimit({
+      windowMs: 60 * 1000,
+      limit: config.apiRateMax,
+      standardHeaders: true,
+      legacyHeaders: false,
+      skip: (req) => req.path === "/status",
+      message: {
+        error: { code: "RATE_LIMITED", message: "Too many requests, slow down and try again shortly" },
+      },
+    }),
+  );
+  app.use("/api", dailyBudget);
+  app.get("/api/status", async (_req, res, next) => {
+    try {
+      res.json(await getStatus());
+    } catch (e) {
+      next(e);
     }
   });
 

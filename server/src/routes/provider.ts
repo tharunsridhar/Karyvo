@@ -6,6 +6,7 @@ import { badRequest, notFound } from "../lib/errors.js";
 import { intParam, parse, wrap } from "../lib/http.js";
 import { isValidDate, isValidTimezone } from "../lib/slots.js";
 import { me, requireAuth, requireRole } from "../middleware/auth.js";
+import { assertCapacity } from "../services/demoGuard.js";
 
 async function profileOf(userId: number) {
   const p = await prisma.providerProfile.findUnique({ where: { userId } });
@@ -116,6 +117,7 @@ export function providerRouter() {
       if (!(await prisma.serviceCategory.findUnique({ where: { id: body.categoryId } }))) {
         throw badRequest("Unknown category");
       }
+      await assertCapacity("services");
       const service = await prisma.service.create({ data: { ...body, providerId: p.id } });
       res.status(201).json({ service });
     }),
