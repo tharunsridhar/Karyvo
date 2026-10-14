@@ -50,7 +50,7 @@ npm test
 Uses a separate `karyvo_test` database and wipes it each run, so never point it at real data.
 
 ## How double booking is stopped
-- The server rechecks the slot when you book.
+- The server rechecks the slot when you book, and bookings for one provider are processed one at a time.
 - On top of that, PostgreSQL itself rejects overlapping bookings for the same provider, so two people clicking at the same moment cannot both win.
 - Full explanation: [docs/concurrency.md](docs/concurrency.md)
 

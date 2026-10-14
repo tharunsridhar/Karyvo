@@ -72,6 +72,8 @@ export async function availableSlots(serviceId: number, date: string) {
   return { service, timezone: tz, slots };
 }
 
+const BOOKING_LOCK_NS = 7001;
+
 function isDeadlock(e: unknown) {
   if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2034") return true;
   const msg = String((e as Error)?.message ?? "");
@@ -130,42 +132,49 @@ export async function createBooking(args: {
   // The exclusion constraint on Booking is the real guard: if a concurrent request
   // inserted an overlapping blocking booking first, this insert fails atomically.
   const insert = () =>
-    prisma.$transaction(async (tx) => {
-      const b = await tx.booking.create({
-        data: {
+    prisma.$transaction(
+      async (tx) => {
+        // Queue bookings per provider. Without this, racing inserts on the exclusion constraint
+        // resolve through PostgreSQL deadlock detection (about a second each), which is slow and
+        // can outlast the transaction timeout. The constraint below stays as the safety net.
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(${BOOKING_LOCK_NS}::int, ${svc.providerId}::int)`;
+        const b = await tx.booking.create({
+          data: {
+            customerId,
+            providerId: svc.providerId,
+            serviceId: svc.id,
+            startAt: args.startAt,
+            endAt,
+            priceCents: svc.priceCents,
+            currency: svc.currency,
+            serviceTitle: svc.title,
+            notes: args.notes,
+            idempotencyKey,
+          },
+        });
+        await tx.bookingStatusHistory.create({
+          data: { bookingId: b.id, toStatus: "PENDING", actorId: customerId, note: "Booking requested" },
+        });
+        await notify(
+          tx,
+          svc.provider.userId,
+          "BOOKING_REQUESTED",
+          `New booking request for ${svc.title} on ${fmt(args.startAt, svc.provider.timezone)}`,
+          b.id,
+          `booking:${b.id}:created`,
+        );
+        await notify(
+          tx,
           customerId,
-          providerId: svc.providerId,
-          serviceId: svc.id,
-          startAt: args.startAt,
-          endAt,
-          priceCents: svc.priceCents,
-          currency: svc.currency,
-          serviceTitle: svc.title,
-          notes: args.notes,
-          idempotencyKey,
-        },
-      });
-      await tx.bookingStatusHistory.create({
-        data: { bookingId: b.id, toStatus: "PENDING", actorId: customerId, note: "Booking requested" },
-      });
-      await notify(
-        tx,
-        svc.provider.userId,
-        "BOOKING_REQUESTED",
-        `New booking request for ${svc.title} on ${fmt(args.startAt, svc.provider.timezone)}`,
-        b.id,
-        `booking:${b.id}:created`,
-      );
-      await notify(
-        tx,
-        customerId,
-        "BOOKING_CREATED",
-        `Your request for ${svc.title} on ${fmt(args.startAt, svc.provider.timezone)} was sent`,
-        b.id,
-        `booking:${b.id}:created`,
-      );
-      return b;
-    });
+          "BOOKING_CREATED",
+          `Your request for ${svc.title} on ${fmt(args.startAt, svc.provider.timezone)} was sent`,
+          b.id,
+          `booking:${b.id}:created`,
+        );
+        return b;
+      },
+      { maxWait: 10_000, timeout: 15_000 },
+    );
 
   // When several inserts race on the same range, PostgreSQL may abort a loser as a deadlock
   // victim instead of raising the overlap error. Retrying lets it see the winner and conflict
@@ -175,7 +184,11 @@ export async function createBooking(args: {
     try {
       return { booking: await insert(), replay: false };
     } catch (e) {
-      if (isOverlapError(e)) throw conflict("That time slot was just taken", "SLOT_TAKEN");
+      if (isOverlapError(e)) {
+        const again = await findReplay();
+        if (again) return { booking: again, replay: true };
+        throw conflict("That time slot was just taken", "SLOT_TAKEN");
+      }
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
         const again = await findReplay();
         if (again) return { booking: again, replay: true };
