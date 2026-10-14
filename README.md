@@ -61,7 +61,7 @@ docker compose up --build -d
 Set `JWT_SECRET` first. The app runs on http://localhost:4000. Add demo data with `docker compose exec app npx tsx prisma/seed.ts`.
 
 ## Deploying on a free tier
-- `render.yaml` sets up a free Render service. Use a free Neon database and paste its connection string as `DATABASE_URL`.
+- `render.yaml` sets up a free Render web service and a free Render Postgres, already connected to each other. Render deletes free databases after 30 days. For a database that does not expire, use a free Neon database and set its connection string as `DATABASE_URL` instead.
 - Free hosting has limits, so the app protects itself: caps on users, bookings and services, a daily request budget, and a "server is full" banner when they are reached. All of it is configurable in `server/.env.example`.
 
 ## Notes

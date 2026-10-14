@@ -1,5 +1,12 @@
-# Render blueprint: one free web service built from the Dockerfile.
-# The database lives on Neon (free). Paste its direct (non-pooled) connection string as DATABASE_URL.
+# Render blueprint: one free web service built from the Dockerfile, plus a free Render Postgres
+# that is wired in automatically (no connection string to paste).
+# Note: Render deletes free databases 30 days after creation, so re-seed or move to Neon after that.
+databases:
+  - name: mr-fix-my-home-db
+    plan: free
+    databaseName: mrfixmyhome
+    user: mrfixmyhome
+
 services:
   - type: web
     name: mr-fix-my-home
@@ -10,7 +17,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: mr-fix-my-home-db
+          property: connectionString
       - key: JWT_SECRET
         generateValue: true
       - key: COOKIE_SECURE
