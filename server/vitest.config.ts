@@ -7,7 +7,7 @@ export default defineConfig({
     testTimeout: 20000,
     env: {
       NODE_ENV: "test",
-      DATABASE_URL: process.env.TEST_DATABASE_URL ?? "postgresql://karyvo@localhost:5433/karyvo_test",
+      DATABASE_URL: process.env.TEST_DATABASE_URL ?? "postgresql://mrfixmyhome@localhost:5433/mrfixmyhome_test",
       JWT_SECRET: "test-secret-0123456789abcdef",
       AUTH_RATE_MAX: "1000",
       API_RATE_MAX: "100000",

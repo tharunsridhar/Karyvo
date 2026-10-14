@@ -6,7 +6,7 @@ import { prisma } from "../db.js";
 import { forbidden, unauthorized } from "../lib/errors.js";
 import { wrap } from "../lib/http.js";
 
-export const COOKIE = "karyvo_token";
+export const COOKIE = "mrfixmyhome_token";
 
 export function signToken(userId: number): string {
   return jwt.sign({ sub: userId }, config.jwtSecret, { expiresIn: "7d" });

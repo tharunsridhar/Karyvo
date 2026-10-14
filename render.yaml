@@ -2,7 +2,7 @@
 # The database lives on Neon (free). Paste its direct (non-pooled) connection string as DATABASE_URL.
 services:
   - type: web
-    name: karyvo
+    name: mr-fix-my-home
     runtime: docker
     plan: free
     healthCheckPath: /health

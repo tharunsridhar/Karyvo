@@ -9,14 +9,14 @@ const json = (schema: object) => ({ required: true, content: { "application/json
 export const openapi = {
   openapi: "3.0.3",
   info: {
-    title: "Karyvo API",
+    title: "Mr Fix My Home API",
     version: "1.0.0",
     description:
-      "Local services booking platform. Auth uses an httpOnly cookie (karyvo_token) set by /auth/login or /auth/register. Errors share one shape: { error: { code, message, details?, requestId } }.",
+      "Local services booking platform. Auth uses an httpOnly cookie (mrfixmyhome_token) set by /auth/login or /auth/register. Errors share one shape: { error: { code, message, details?, requestId } }.",
   },
   servers: [{ url: "/api" }],
   components: {
-    securitySchemes: { cookieAuth: { type: "apiKey", in: "cookie", name: "karyvo_token" } },
+    securitySchemes: { cookieAuth: { type: "apiKey", in: "cookie", name: "mrfixmyhome_token" } },
     schemas: {
       Error: {
         type: "object",

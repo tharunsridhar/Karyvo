@@ -32,7 +32,7 @@ function summary(name, r) {
   );
 }
 
-const cookie = await login("customer2@karyvo.test");
+const cookie = await login("customer2@mrfixmyhome.test");
 
 summary("slot search", await run({ url: `${base}/api/services/1/slots?date=${day}` }));
 

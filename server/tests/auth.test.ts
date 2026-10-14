@@ -80,7 +80,7 @@ describe("authentication", () => {
     expect((await agent.get("/api/auth/me")).status).toBe(200);
     await agent.post("/api/auth/logout");
     expect((await agent.get("/api/auth/me")).status).toBe(401);
-    const forged = await request(app).get("/api/auth/me").set("Cookie", "karyvo_token=garbage");
+    const forged = await request(app).get("/api/auth/me").set("Cookie", "mrfixmyhome_token=garbage");
     expect(forged.status).toBe(401);
   });
 

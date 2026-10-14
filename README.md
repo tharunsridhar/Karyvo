@@ -1,4 +1,4 @@
-# Karyvo
+# Mr Fix My Home
 
 A booking site for local services like plumbing, electrical work and cleaning. Customers pick a free time slot and book it. Providers set their working hours and accept jobs. Admins keep things in order.
 
@@ -34,20 +34,20 @@ npm run dev:web
 - Website: http://localhost:5173
 - API docs: http://localhost:4000/api/docs
 
-No local database? Run `docker compose up -d postgres` and use `postgresql://karyvo:karyvo@localhost:5434/karyvo` as `DATABASE_URL`.
+No local database? Run `docker compose up -d postgres` and use `postgresql://mrfixmyhome:mrfixmyhome@localhost:5434/mrfixmyhome` as `DATABASE_URL`.
 
 ## Demo logins
 Password for all of them is `Password123!`
 
-- Customer: `customer@karyvo.test`
-- Provider: `provider@karyvo.test`
-- Admin: `admin@karyvo.test`
+- Customer: `customer@mrfixmyhome.test`
+- Provider: `provider@mrfixmyhome.test`
+- Admin: `admin@mrfixmyhome.test`
 
 ## Tests
 ```bash
 npm test
 ```
-Uses a separate `karyvo_test` database and wipes it each run, so never point it at real data.
+Uses a separate `mrfixmyhome_test` database and wipes it each run, so never point it at real data.
 
 ## How double booking is stopped
 - The server rechecks the slot when you book, and bookings for one provider are processed one at a time.

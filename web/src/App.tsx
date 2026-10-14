@@ -33,7 +33,7 @@ function Nav() {
     <header className="nav">
       <nav className="nav-inner" aria-label="Main">
         <Link to="/" className="logo">
-          Karyvo
+          Mr Fix My Home
         </Link>
         <NavLink className="link" to="/services">
           Find services
@@ -155,7 +155,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      <footer>Karyvo demo project. Not a real marketplace.</footer>
+      <footer>Mr Fix My Home demo project. Not a real marketplace.</footer>
     </>
   );
 }

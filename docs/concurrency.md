@@ -1,4 +1,4 @@
-# How Karyvo prevents double booking
+# How Mr Fix My Home prevents double booking
 
 ## The problem
 - Two customers open the same free slot and both press "Book" at nearly the same moment.

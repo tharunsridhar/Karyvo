@@ -19,14 +19,14 @@ async function main() {
   const upsertUser = (name: string, email: string, role: "CUSTOMER" | "PROVIDER" | "ADMIN") =>
     prisma.user.upsert({ where: { email }, update: {}, create: { name, email, role, passwordHash: hash } });
 
-  await upsertUser("Admin User", "admin@karyvo.test", "ADMIN");
-  const customer = await upsertUser("Casey Customer", "customer@karyvo.test", "CUSTOMER");
-  await upsertUser("Sam Second", "customer2@karyvo.test", "CUSTOMER");
+  await upsertUser("Admin User", "admin@mrfixmyhome.test", "ADMIN");
+  const customer = await upsertUser("Casey Customer", "customer@mrfixmyhome.test", "CUSTOMER");
+  await upsertUser("Sam Second", "customer2@mrfixmyhome.test", "CUSTOMER");
 
   const providers = [
     {
       name: "Priya Plumbing",
-      email: "provider@karyvo.test",
+      email: "provider@mrfixmyhome.test",
       city: "Chennai",
       tz: "Asia/Kolkata",
       areas: ["600", "603"],
@@ -38,7 +38,7 @@ async function main() {
     },
     {
       name: "Eli Electric",
-      email: "provider2@karyvo.test",
+      email: "provider2@mrfixmyhome.test",
       city: "Bengaluru",
       tz: "Asia/Kolkata",
       areas: ["560", "562"],
@@ -50,7 +50,7 @@ async function main() {
     },
     {
       name: "Clara Cleans",
-      email: "provider3@karyvo.test",
+      email: "provider3@mrfixmyhome.test",
       city: "Mumbai",
       tz: "Asia/Kolkata",
       areas: ["400", "401"],
@@ -106,7 +106,7 @@ async function main() {
 
   // One completed, reviewed booking in the past so ratings show up in the demo.
   const priya = await prisma.providerProfile.findFirstOrThrow({
-    where: { user: { email: "provider@karyvo.test" } },
+    where: { user: { email: "provider@mrfixmyhome.test" } },
     include: { services: true },
   });
   if ((await prisma.booking.count({ where: { providerId: priya.id } })) === 0) {
@@ -145,8 +145,8 @@ async function main() {
   }
 
   console.log("Seed complete. Demo accounts (password: " + DEMO_PASSWORD + "):");
-  console.log("  admin@karyvo.test, customer@karyvo.test, customer2@karyvo.test");
-  console.log("  provider@karyvo.test, provider2@karyvo.test, provider3@karyvo.test");
+  console.log("  admin@mrfixmyhome.test, customer@mrfixmyhome.test, customer2@mrfixmyhome.test");
+  console.log("  provider@mrfixmyhome.test, provider2@mrfixmyhome.test, provider3@mrfixmyhome.test");
 }
 
 main().finally(() => prisma.$disconnect());

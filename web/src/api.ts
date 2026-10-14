@@ -34,7 +34,7 @@ export async function api<T = unknown>(
   const data = await res.json().catch(() => null);
   if (!res.ok) {
     const e = data?.error;
-    if (e?.code === "SERVER_FULL") window.dispatchEvent(new Event("karyvo:full"));
+    if (e?.code === "SERVER_FULL") window.dispatchEvent(new Event("mrfixmyhome:full"));
     throw new ApiError(res.status, e?.code ?? "ERROR", e?.message ?? "Something went wrong", e?.details);
   }
   return data as T;

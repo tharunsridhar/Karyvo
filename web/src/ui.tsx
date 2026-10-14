@@ -138,11 +138,11 @@ export function StatusBanner() {
         .catch(() => undefined);
     check();
     const timer = setInterval(check, 5 * 60_000);
-    window.addEventListener("karyvo:full", check);
+    window.addEventListener("mrfixmyhome:full", check);
     return () => {
       live = false;
       clearInterval(timer);
-      window.removeEventListener("karyvo:full", check);
+      window.removeEventListener("mrfixmyhome:full", check);
     };
   }, []);
 
