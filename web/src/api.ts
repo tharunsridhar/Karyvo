@@ -111,8 +111,12 @@ export interface Booking {
   history?: { id: number; fromStatus: string | null; toStatus: string; note: string; createdAt: string }[];
 }
 
-export const money = (cents: number, currency = "USD") =>
-  new Intl.NumberFormat(undefined, { style: "currency", currency }).format(cents / 100);
+export const money = (cents: number, currency = "INR") =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
+  }).format(cents / 100);
 
 export const fmtDateTime = (iso: string, tz?: string) =>
   new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short", timeZone: tz }).format(

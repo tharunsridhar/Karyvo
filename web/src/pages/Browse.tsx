@@ -122,15 +122,15 @@ export function Services() {
             </select>
           </label>
           <label>
-            Postcode
+            PIN code
             <input
               value={filters.postcode}
               onChange={(e) => setFilters({ ...filters, postcode: e.target.value })}
-              placeholder="e.g. SW1A"
+              placeholder="e.g. 600001"
             />
           </label>
           <label>
-            Max price
+            Max price (₹)
             <input
               type="number"
               min="0"

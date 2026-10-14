@@ -81,8 +81,8 @@ PENDING | ACCEPTED -> CANCELLED (customer, provider or admin)
 ## Data decisions
 - Timestamps: UTC.
 - Working hours: local minutes after midnight plus weekday, interpreted in the provider's IANA timezone.
-- Money: integer cents plus a currency code.
-- Coverage areas: postcode prefixes (for example `SW1`).
+- Money: integer minor units (paise) plus a currency code. Default is INR, shown as rupees.
+- Coverage areas: PIN code prefixes (for example `600`).
 - Categories seeded: Plumbing, Electrical, Cleaning, Pest Control, Gardening, Painting.
 
 ## Local setup

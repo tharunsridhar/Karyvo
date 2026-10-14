@@ -20,15 +20,13 @@ describe("authentication", () => {
   });
 
   it("creates a provider profile for provider registrations and rejects admin self-registration", async () => {
-    const ok = await request(app)
-      .post("/api/auth/register")
-      .send({
-        name: "Pat",
-        email: "pat@example.com",
-        password: "supersecret1",
-        role: "PROVIDER",
-        timezone: "Europe/London",
-      });
+    const ok = await request(app).post("/api/auth/register").send({
+      name: "Pat",
+      email: "pat@example.com",
+      password: "supersecret1",
+      role: "PROVIDER",
+      timezone: "Europe/London",
+    });
     expect(ok.status).toBe(201);
     const p = await prisma.providerProfile.findFirst({ where: { user: { email: "pat@example.com" } } });
     expect(p?.timezone).toBe("Europe/London");

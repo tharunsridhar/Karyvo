@@ -107,7 +107,7 @@ interface Svc {
 function ServicesTab() {
   const { data, error, loading, reload } = useApi<{ services: Svc[] }>("/provider/services");
   const cats = useApi<{ categories: Category[] }>("/categories");
-  const blank = { id: 0, title: "", description: "", durationMin: 60, price: "50", categoryId: 0 };
+  const blank = { id: 0, title: "", description: "", durationMin: 60, price: "500", categoryId: 0 };
   const [form, setForm] = useState(blank);
   const [formError, setFormError] = useState<unknown>(null);
 
@@ -227,7 +227,7 @@ function ServicesTab() {
             />
           </label>
           <label>
-            Price
+            Price (₹)
             <input
               type="number"
               min={0}
@@ -523,10 +523,10 @@ function ProfileTab() {
         </datalist>
       </label>
       <label>
-        Postcode prefixes you cover (comma separated)
+        PIN code prefixes you cover (comma separated)
         <input
           value={f.areas}
-          placeholder="SW1, SW3, E1"
+          placeholder="600, 603, 641"
           onChange={(e) => setF({ ...f, areas: e.target.value })}
         />
       </label>

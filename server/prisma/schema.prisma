@@ -77,7 +77,7 @@ model Service {
   description  String          @default("")
   durationMin  Int
   priceCents   Int
-  currency     String          @default("USD")
+  currency     String          @default("INR")
   active       Boolean         @default(true)
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt

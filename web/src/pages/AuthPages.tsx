@@ -13,6 +13,13 @@ function useAfterAuth() {
     });
 }
 
+const DEMO_PASSWORD = "Password123!";
+const DEMO_ACCOUNTS = [
+  { role: "Customer", username: "customer@karyvo.test" },
+  { role: "Provider", username: "provider@karyvo.test" },
+  { role: "Admin", username: "admin@karyvo.test" },
+];
+
 export function Login() {
   const { login } = useAuth();
   const after = useAfterAuth();
@@ -66,9 +73,35 @@ export function Login() {
       <p>
         New here? <Link to="/register">Create an account</Link>
       </p>
-      <p className="muted small-text">
-        Demo: customer@karyvo.test, provider@karyvo.test or admin@karyvo.test, password Password123!
-      </p>
+      <section className="card demo" aria-labelledby="demo-title">
+        <h2 id="demo-title">Demo accounts</h2>
+        <p className="muted small-text">Fake data for trying the app. Click Use to fill the form.</p>
+        <div className="list">
+          {DEMO_ACCOUNTS.map((a) => (
+            <div className="item" key={a.username}>
+              <div>
+                <strong>{a.role}</strong>
+                <div className="small-text">
+                  Username: <code>{a.username}</code>
+                </div>
+                <div className="small-text">
+                  Password: <code>{DEMO_PASSWORD}</code>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn small secondary"
+                onClick={() => {
+                  setEmail(a.username);
+                  setPassword(DEMO_PASSWORD);
+                }}
+              >
+                Use
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

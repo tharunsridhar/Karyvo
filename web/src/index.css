@@ -478,3 +478,20 @@ footer {
   padding: 2rem 1rem;
   font-size: 0.85rem;
 }
+
+.demo {
+  margin-top: 1rem;
+}
+.demo h2 {
+  font-size: 1.05rem;
+}
+.demo code {
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+  user-select: all;
+}
+.demo .btn {
+  align-self: center;
+}
